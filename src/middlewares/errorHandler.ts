@@ -10,7 +10,7 @@ export default function errorHandler(
   req: Request,
   res: Response,
 ) {
-  console.error(error);
+  //   console.error('error handler', error);
 
   const status = error.status || 500;
   const message = error.message || 'Internal Server Error';
