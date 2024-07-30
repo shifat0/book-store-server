@@ -4,8 +4,11 @@ import {
   createResponse,
   errorResponse,
   existsErrorResponse,
+  getResponse,
+  notFoundErrorResponse,
 } from '../utils/response';
 
+// Post Authors
 export const postAuthorsController = async (
   req: Request,
   res: Response,
@@ -41,25 +44,43 @@ export const postAuthorsController = async (
   }
 };
 
+// Get Authors
 export const getAuthorsController = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    res.send('This is get route');
+    const authors = await db('authors').select('*');
+    console.log(authors);
+
+    if (!authors) return res.status(404).json(notFoundErrorResponse());
+
+    res.status(200).json(getResponse(authors));
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };
 
+// Get Author By ID
 export const getSingleAuthorController = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    res.send('This is single get route');
+    const { id } = req.params;
+
+    if (!id || isNaN(Number(id)))
+      return res.status(400).json(errorResponse('Invalid author ID'));
+
+    // Find authors
+    const author = await db('authors').where({ id }).first();
+
+    if (!author) return res.status(404).json(notFoundErrorResponse('Author'));
+
+    res.status(200).json(getResponse(author));
   } catch (error) {
     next(error);
   }

@@ -15,6 +15,11 @@ export const errorResponse = (message: string) => ({
   message: message || 'Something went wrong!',
 });
 
+export const notFoundErrorResponse = (title?: string) => ({
+  success: false,
+  message: `No ${title || 'Data'} Found!`,
+});
+
 export const existsErrorResponse = (title: string) => ({
   success: false,
   message: `${title} already exists!`,
