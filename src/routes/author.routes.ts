@@ -6,18 +6,20 @@ import {
   postAuthorsController,
   updateAuthorController,
 } from '../controllers/authorControllers';
+import validate from '../middlewares/validate';
+import authorValidator from '../validators/authorValidator';
 
 const authorsRouter = Router();
 
 authorsRouter
   .route('/authors')
-  .post(postAuthorsController)
+  .post(validate(authorValidator()), postAuthorsController)
   .get(getAuthorsController);
 
 authorsRouter
   .route('/authors/:id')
   .get(getSingleAuthorController)
-  .put(updateAuthorController)
+  .put(validate(authorValidator()), updateAuthorController)
   .delete(deleteAuthorController);
 
 export default authorsRouter;

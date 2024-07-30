@@ -1,5 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import db from '../db';
+import {
+  createResponse,
+  errorResponse,
+  existsErrorResponse,
+} from '../utils/response';
 
 export const postAuthorsController = async (
   req: Request,
@@ -7,27 +12,31 @@ export const postAuthorsController = async (
   next: NextFunction,
 ) => {
   try {
-    const { name, bio, birthdate } = req.body;
+    const { name, bio, birthDate } = req.body;
+
+    // Checking if a author exists with the same name
+    const existingAuthor = await db('authors').where({ name }).first();
+
+    if (existingAuthor)
+      return res.status(400).json(existsErrorResponse('Author'));
 
     // Create a new book
     const author = {
       name,
       bio,
-      birthdate,
+      birthDate: new Date(birthDate),
     };
 
     // Insert the book into the database
     const result = await db('authors').insert(author);
 
-    console.log(result);
-
-    // Return the created book with a 201 status code
-    res.status(201).json({
+    const payload = {
       id: result[0],
       ...author,
-      message: 'Author Created Successfully',
-    });
-  } catch (error) {
+    };
+
+    res.status(201).json(createResponse(payload, 'Author'));
+  } catch (error: any) {
     next(error);
   }
 };

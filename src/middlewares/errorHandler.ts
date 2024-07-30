@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 interface Error {
   status?: number;
   message?: string;
+  sqlMessage?: string;
 }
 
 export default function errorHandler(
@@ -10,10 +11,11 @@ export default function errorHandler(
   req: Request,
   res: Response,
 ) {
-  //   console.error('error handler', error);
+  console.log('inside error handler');
+  console.log('error handler', error);
 
   const status = error.status || 500;
-  const message = error.message || 'Internal Server Error';
+  const message = error.sqlMessage || error.message || 'Internal Server Error';
 
   res.status(status).json({ message });
 }
