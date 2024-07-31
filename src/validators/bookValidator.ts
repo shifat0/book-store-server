@@ -13,7 +13,7 @@ export default function bookValidator(): ValidationChain[] {
       .isString()
       .withMessage('Description must be a string.'),
 
-    body('publishedDate')
+    body('published_date')
       .notEmpty()
       .withMessage('Published date is required.')
       .isString()
@@ -21,7 +21,7 @@ export default function bookValidator(): ValidationChain[] {
         'Published date must be a valid date in the format YYYY-MM-DD.',
       ),
 
-    body('authorId')
+    body('author_id')
       .notEmpty()
       .withMessage('Author ID is required.')
       .isInt({ gt: 0 })

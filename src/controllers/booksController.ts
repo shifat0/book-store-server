@@ -17,25 +17,25 @@ export const postBooksController = async (
   next: NextFunction,
 ) => {
   try {
-    const { title, description, publishedDate, authorId } = req.body;
+    const { title, description, published_date, author_id } = req.body;
 
     // Checking if a author exists with the same name
     const existingBook = await db('books').where({ title }).first();
     if (existingBook) return res.status(400).json(existsErrorResponse('Book'));
 
     // Check if the author exists
-    const author = await db('authors').where({ id: authorId }).first();
+    const author = await db('authors').where({ id: author_id }).first();
     if (!author)
       return res
         .status(404)
-        .json(notFoundErrorResponse('Author with authorId'));
+        .json(notFoundErrorResponse('Author with author_id'));
 
     // Create a new book
     const book = {
       title,
       description,
-      publishedDate: new Date(publishedDate),
-      authorId,
+      published_date: new Date(published_date),
+      author_id,
     };
 
     // Insert the book into the database
@@ -102,7 +102,7 @@ export const updateBookController = async (
 ) => {
   try {
     const { id } = req.params;
-    const { title, description, publishedDate, authorId } = req.body;
+    const { title, description, published_date, author_id } = req.body;
 
     // Check if the id is valid
     if (!id || isNaN(Number(id)))
@@ -115,10 +115,10 @@ export const updateBookController = async (
     const updatedBook = {
       title,
       description,
-      publishedDate: publishedDate
-        ? new Date(publishedDate)
-        : book.publishedDate,
-      authorId,
+      published_date: published_date
+        ? new Date(published_date)
+        : book.published_date,
+      author_id,
     };
 
     // Update the book
@@ -171,7 +171,7 @@ export const getBooksByAuthorId = async (
   try {
     const { id } = req.params;
 
-    const books = await db('books').where({ authorId: id });
+    const books = await db('books').where({ author_id: id });
 
     if (books.length === 0)
       return res
