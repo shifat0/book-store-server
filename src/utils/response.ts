@@ -10,7 +10,13 @@ export const getResponse = (data: any) => ({
   data: data,
 });
 
-export const errorResponse = (message: string) => ({
+export const updateResponse = (title: string, data?: any) => ({
+  success: true,
+  message: `${title} updated successfully`,
+  data: data,
+});
+
+export const errorResponse = (message?: string) => ({
   success: false,
   message: message || 'Something went wrong!',
 });

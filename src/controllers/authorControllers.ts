@@ -6,6 +6,7 @@ import {
   existsErrorResponse,
   getResponse,
   notFoundErrorResponse,
+  updateResponse,
 } from '../utils/response';
 
 // Post Authors
@@ -86,18 +87,42 @@ export const getSingleAuthorController = async (
   }
 };
 
+// Update Author
 export const updateAuthorController = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    res.send('This is update route');
+    const { id } = req.params;
+    const { name, bio, birthdate } = req.body;
+
+    // Check if the author exists
+    const author = await db('authors').where({ id }).first();
+    if (!author) return res.status(404).json(notFoundErrorResponse('Author'));
+
+    const updatedAuthor = {
+      name,
+      bio,
+      birthdate: birthdate ? new Date(birthdate) : author.birthdate,
+    };
+
+    // Update the author
+    const isUpdated = await db('authors').where({ id }).update(updatedAuthor);
+
+    if (isUpdated !== 1)
+      return res
+        .status(500)
+        .json(errorResponse('Author update failed due to server error!'));
+
+    // Return the updated author
+    res.status(200).json(updateResponse('Author', updatedAuthor));
   } catch (error) {
     next(error);
   }
 };
 
+// Delete Author
 export const deleteAuthorController = async (
   req: Request,
   res: Response,

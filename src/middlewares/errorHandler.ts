@@ -11,8 +11,7 @@ export default function errorHandler(
   req: Request,
   res: Response,
 ) {
-  console.log('inside error handler');
-  console.log('error handler', error);
+  console.error(error.message);
 
   const status = error.status || 500;
   const message = error.sqlMessage || error.message || 'Internal Server Error';
