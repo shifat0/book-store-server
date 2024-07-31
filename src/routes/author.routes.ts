@@ -8,6 +8,7 @@ import {
 } from '../controllers/authorControllers';
 import validate from '../middlewares/validate';
 import authorValidator from '../validators/authorValidator';
+import { getBooksByAuthorId } from '../controllers/booksController';
 
 const authorsRouter = Router();
 
@@ -21,5 +22,7 @@ authorsRouter
   .get(getSingleAuthorController)
   .put(validate(authorValidator()), updateAuthorController)
   .delete(deleteAuthorController);
+
+authorsRouter.get('/authors/:id/books', getBooksByAuthorId);
 
 export default authorsRouter;
