@@ -8,7 +8,8 @@
     "start": "nodemon build/server.js",
     "dev": "nodemon src/server.ts",
     "lint": "eslint 'src/**/*.ts'",
-    "format": "prettier --write 'src/**/*.ts'"
+    "format": "prettier --write 'src/**/*.ts'",
+    "migrate": "knex migrate:latest"
   },
   "keywords": [],
   "author": "Shoaib",
