@@ -60,12 +60,43 @@ export const getBooksController = async (
   next: NextFunction,
 ) => {
   try {
-    const books = await db('books').select('*');
+    // Parseing query params
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const offset = (page - 1) * limit;
 
-    //Check if book exists
-    if (!books) return res.status(404).json(notFoundErrorResponse());
+    // Parse search params
+    const searchQuery = (req.query.searchQuery as string) || '';
 
-    res.status(200).json(getResponse(books));
+    // Query the database with pagination and search
+    const booksQuery = db('books')
+      .select('*')
+      .where('title', 'like', `%${searchQuery}%`)
+      .orWhere('description', 'like', `%${searchQuery}%`)
+      .offset(offset)
+      .limit(limit);
+
+    const countQuery = db('books')
+      .count({ count: '*' })
+      .where('title', 'like', `%${searchQuery}%`)
+      .orWhere('description', 'like', `%${searchQuery}%`);
+
+    const [books, countResult] = await Promise.all([booksQuery, countQuery]);
+    const totalCount = countResult[0].count as number;
+
+    // Check if books exist
+    if (!books.length)
+      return res.status(404).json(notFoundErrorResponse('Books'));
+
+    // Pagination response
+    const pagination = {
+      totalPages: Math.ceil(totalCount / limit),
+      currentPage: page,
+      pageSize: limit,
+      totalItems: totalCount,
+    };
+
+    res.status(200).json(getResponse(books, pagination));
   } catch (error) {
     next(error);
   }

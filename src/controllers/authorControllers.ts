@@ -53,12 +53,44 @@ export const getAuthorsController = async (
   next: NextFunction,
 ) => {
   try {
-    const authors = await db('authors').select('*');
-    console.log(authors);
+    // Parse pagination parameters
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const offset = (page - 1) * limit;
 
-    if (!authors) return res.status(404).json(notFoundErrorResponse());
+    // Parse search parameters
+    const searchQuery = (req.query.searchQuery as string) || '';
 
-    res.status(200).json(getResponse(authors));
+    // Query the database with pagination and search
+    const authorsQuery = db('authors')
+      .select('*')
+      .where('name', 'like', `%${searchQuery}%`)
+      .offset(offset)
+      .limit(limit);
+
+    const countQuery = db('authors')
+      .count({ count: '*' })
+      .where('name', 'like', `%${searchQuery}%`);
+
+    const [authors, countResult] = await Promise.all([
+      authorsQuery,
+      countQuery,
+    ]);
+    const totalCount = countResult[0].count as number;
+
+    // Check if authors exist
+    if (!authors.length)
+      return res.status(404).json(notFoundErrorResponse('Authors'));
+
+    // Prepare pagination response
+    const pagination = {
+      totalPages: Math.ceil(totalCount / limit),
+      currentPage: page,
+      pageSize: limit,
+      totalItems: totalCount,
+    };
+
+    res.status(200).json(getResponse(authors, pagination));
   } catch (error) {
     console.log(error);
     next(error);
