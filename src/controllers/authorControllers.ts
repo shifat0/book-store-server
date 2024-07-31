@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import db from '../db';
 import {
   createResponse,
+  deleteResponse,
   errorResponse,
   existsErrorResponse,
   getResponse,
@@ -73,12 +74,12 @@ export const getSingleAuthorController = async (
   try {
     const { id } = req.params;
 
+    // Check if id is valid
     if (!id || isNaN(Number(id)))
       return res.status(400).json(errorResponse('Invalid author ID'));
 
-    // Find authors
+    // Check if the author exists
     const author = await db('authors').where({ id }).first();
-
     if (!author) return res.status(404).json(notFoundErrorResponse('Author'));
 
     res.status(200).json(getResponse(author));
@@ -96,6 +97,10 @@ export const updateAuthorController = async (
   try {
     const { id } = req.params;
     const { name, bio, birthdate } = req.body;
+
+    // Check if the id is valid
+    if (!id || isNaN(Number(id)))
+      return res.status(400).json(errorResponse('Invalid author ID'));
 
     // Check if the author exists
     const author = await db('authors').where({ id }).first();
@@ -129,7 +134,20 @@ export const deleteAuthorController = async (
   next: NextFunction,
 ) => {
   try {
-    res.send('This is delete route');
+    const { id } = req.params;
+
+    // Check if id is valid
+    if (!id || isNaN(Number(id)))
+      return res.status(400).json(errorResponse('Invalid author ID'));
+
+    // Check if the author exists
+    const author = await db('authors').where({ id }).first();
+    if (!author) return res.status(404).json(notFoundErrorResponse('Author'));
+
+    const deletedAuthor = await db('authors').where({ id }).del();
+    console.log(deleteResponse);
+
+    res.status(200).json(deleteResponse('Author'));
   } catch (error) {
     next(error);
   }

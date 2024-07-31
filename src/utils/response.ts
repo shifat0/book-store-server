@@ -16,6 +16,11 @@ export const updateResponse = (title: string, data?: any) => ({
   data: data,
 });
 
+export const deleteResponse = (title: string, data?: any) => ({
+  success: true,
+  message: `${title} deleted successfully`,
+});
+
 export const errorResponse = (message?: string) => ({
   success: false,
   message: message || 'Something went wrong!',
@@ -23,7 +28,7 @@ export const errorResponse = (message?: string) => ({
 
 export const notFoundErrorResponse = (title?: string) => ({
   success: false,
-  message: `No ${title || 'Data'} Found!`,
+  message: `${title || 'Data'}  Not Found!`,
 });
 
 export const existsErrorResponse = (title: string) => ({
