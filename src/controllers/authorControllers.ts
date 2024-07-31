@@ -144,8 +144,8 @@ export const deleteAuthorController = async (
     const author = await db('authors').where({ id }).first();
     if (!author) return res.status(404).json(notFoundErrorResponse('Author'));
 
-    const deletedAuthor = await db('authors').where({ id }).del();
-    console.log(deleteResponse);
+    // Deleting Author
+    await db('authors').where({ id }).del();
 
     res.status(200).json(deleteResponse('Author'));
   } catch (error) {

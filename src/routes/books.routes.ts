@@ -6,15 +6,20 @@ import {
   postBooksController,
   updateBookController,
 } from '../controllers/booksController';
+import validate from '../middlewares/validate';
+import bookValidator from '../validators/bookValidator';
 
 const booksRouter = Router();
 
-booksRouter.route('/books').post(postBooksController).get(getBooksController);
+booksRouter
+  .route('/books')
+  .post(validate(bookValidator()), postBooksController)
+  .get(getBooksController);
 
 booksRouter
   .route('/books/:id')
   .get(getSingleBookController)
-  .put(updateBookController)
+  .put(validate(bookValidator()), updateBookController)
   .delete(deleteBookController);
 
 export default booksRouter;

@@ -28,7 +28,7 @@ export const errorResponse = (message?: string) => ({
 
 export const notFoundErrorResponse = (title?: string) => ({
   success: false,
-  message: `${title || 'Data'}  Not Found!`,
+  message: `${title || 'Data'} Not Found!`,
 });
 
 export const existsErrorResponse = (title: string) => ({

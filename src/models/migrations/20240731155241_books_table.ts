@@ -5,7 +5,7 @@ export async function up(knex: Knex): Promise<void> {
     table.increments('id').primary();
     table.string('title').notNullable();
     table.text('description');
-    table.date('publishedDate').notNullable();
+    table.string('publishedDate').notNullable();
     table.integer('authorId').unsigned().notNullable();
     table.foreign('authorId').references('id').inTable('authors');
   });
