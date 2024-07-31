@@ -4,7 +4,6 @@ This is a simple Book Store API built with Node.js, Express, MySQL, and Knex.js.
 
 ## Table of Contents
 
-- [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Database Setup](#database-setup)
 - [Run the server](#run-the-server)
