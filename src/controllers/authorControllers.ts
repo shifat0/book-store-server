@@ -41,7 +41,7 @@ export const postAuthorsController = async (
     };
 
     res.status(201).json(createResponse(payload, 'Author'));
-  } catch (error: any) {
+  } catch (error: unknown) {
     next(error);
   }
 };
@@ -91,8 +91,7 @@ export const getAuthorsController = async (
     };
 
     res.status(200).json(getResponse(authors, pagination));
-  } catch (error) {
-    console.log(error);
+  } catch (error: unknown) {
     next(error);
   }
 };
@@ -115,7 +114,7 @@ export const getSingleAuthorController = async (
     if (!author) return res.status(404).json(notFoundErrorResponse('Author'));
 
     res.status(200).json(getResponse(author));
-  } catch (error) {
+  } catch (error: unknown) {
     next(error);
   }
 };
@@ -154,7 +153,7 @@ export const updateAuthorController = async (
 
     // Return the updated author
     res.status(200).json(updateResponse('Author', updatedAuthor));
-  } catch (error) {
+  } catch (error: unknown) {
     next(error);
   }
 };
@@ -180,7 +179,39 @@ export const deleteAuthorController = async (
     await db('authors').where({ id }).del();
 
     res.status(200).json(deleteResponse('Author'));
-  } catch (error) {
+  } catch (error: unknown) {
+    next(error);
+  }
+};
+
+export const getAuthorsWithBooks = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    // const authorsWithBooks = await db('authors')
+    //   .select(
+    //     'authors.id as author_id',
+    //     'name as author_name',
+    //     'bio as author_bio',
+    //     'birthdate as author_birthdate',
+    //   )
+    //   .leftJoin('books', 'authors.id', '=', 'books.author_id')
+    //   .orderBy(['authors.id', 'books.id'])
+    //   .groupBy('authors.id');
+
+    const query = `
+    SELECT *, books.title as title, books.description as description FROM authors
+LEFT JOIN books ON authors.id = books.author_id
+GROUP BY authors.id`;
+
+    const authorsWithBooks = await db.raw(query);
+
+    console.log(authorsWithBooks);
+
+    res.status(200).json(getResponse(authorsWithBooks[0]));
+  } catch (error: unknown) {
     next(error);
   }
 };

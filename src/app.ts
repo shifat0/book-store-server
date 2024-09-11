@@ -14,16 +14,13 @@ app.use(express.json());
 app.use(cors());
 
 // Root Url
-app.get(
-  envConfig.API_BASE_URL as string,
-  async (_, res: Response, next: NextFunction) => {
-    try {
-      res.send('Server is online!');
-    } catch (error) {
-      next(error);
-    }
-  },
-);
+app.get('/', async (_, res: Response, next: NextFunction) => {
+  try {
+    res.send('Server is online!');
+  } catch (error) {
+    next(error);
+  }
+});
 
 // Router
 app.use(envConfig.API_BASE_URL as string, router);

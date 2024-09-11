@@ -4,7 +4,7 @@ import { envConfig } from './config/envConfig';
 const { DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME } = envConfig;
 
 const dbConfig = {
-  client: 'mysql',
+  client: 'mysql2',
   connection: {
     host: DB_HOST,
     port: parseInt(DB_PORT as string),

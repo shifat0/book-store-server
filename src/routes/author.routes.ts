@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   deleteAuthorController,
   getAuthorsController,
+  getAuthorsWithBooks,
   getSingleAuthorController,
   postAuthorsController,
   updateAuthorController,
@@ -24,5 +25,6 @@ authorsRouter
   .delete(deleteAuthorController);
 
 authorsRouter.get('/authors/:id/books', getBooksByAuthorId);
+authorsRouter.get('/authors-with-books', getAuthorsWithBooks);
 
 export default authorsRouter;

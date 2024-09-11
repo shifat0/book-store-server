@@ -3,11 +3,14 @@
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
-    "prettier"
+    "plugin:prettier/recommended"
   ],
   "plugins": ["@typescript-eslint", "prettier"],
   "rules": {
-    "prettier/prettier": "error"
+    "prettier/prettier": [
+      "error",
+      { "endOfLine": "auto", "singleQuote": true, "parser": "flow" }
+    ]
   },
   "env": {
     "node": true,
