@@ -127,11 +127,46 @@ export const getSingleBookController = async (
     if (!id || isNaN(Number(id)))
       return res.status(400).json(errorResponse('Invalid book ID'));
 
-    // Check if the book exists
-    const book = await db<Books>('books').where({ id }).first();
+    // Fetch books from db
+    const book = await db('books')
+      .select(
+        'books.id as id',
+        'books.title',
+        'books.description',
+        'books.published_date',
+        'authors.id as author_id',
+        'authors.name as author_name',
+        'authors.bio as author_bio',
+        'authors.birthdate as author_birthdate',
+      )
+      .leftJoin('authors', 'books.author_id', 'authors.id')
+      .where('books.id', id)
+      .first();
+
+    // Check if a book exists
     if (!book) return res.status(404).json(notFoundErrorResponse('Book'));
 
-    res.status(200).json(getResponse(book));
+    // Destructuring author info from the response of db
+    const {
+      author_id,
+      author_name,
+      author_bio,
+      author_birthdate,
+      ...bookProperties
+    } = book;
+
+    // New book Response with author details
+    const bookResponse = {
+      ...bookProperties,
+      author: {
+        id: author_id,
+        name: author_name,
+        bio: author_bio,
+        author_birthdate: author_birthdate,
+      },
+    };
+
+    res.status(200).json(getResponse(bookResponse));
   } catch (error) {
     next(error);
   }
