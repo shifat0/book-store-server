@@ -69,20 +69,33 @@ export const getBooksController = async (
     const offset = (page - 1) * limit;
 
     // Parse search params
+    const authorId = (req.query.author as string) || '';
     const searchQuery = (req.query.searchQuery as string) || '';
 
     // Query the database with pagination and search
     const booksQuery = db<Books>('books')
       .select('*')
-      .where('title', 'like', `%${searchQuery}%`)
-      .orWhere('description', 'like', `%${searchQuery}%`)
+      .where('author_id', authorId)
+      .andWhere(function () {
+        this.where('title', 'like', `%${searchQuery}%`).orWhere(
+          'description',
+          'like',
+          `%{searchQuery}%`,
+        );
+      })
       .offset(offset)
       .limit(limit);
 
     const countQuery = db<Books>('books')
       .count({ count: '*' })
-      .where('title', 'like', `%${searchQuery}%`)
-      .orWhere('description', 'like', `%${searchQuery}%`);
+      .where('author_id', authorId)
+      .andWhere(function () {
+        this.where('title', 'like', `%${searchQuery}%`).orWhere(
+          'description',
+          'like',
+          `%{searchQuery}%`,
+        );
+      });
 
     const [books, countResult] = await Promise.all([booksQuery, countQuery]);
     const totalCount = countResult[0].count as number;
