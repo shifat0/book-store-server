@@ -1,10 +1,12 @@
+import { IPagination } from '../types/types';
+
 export const createResponse = (data?: any, title?: string) => ({
   success: true,
   message: `${title} created successfully`,
   data: data,
 });
 
-export const getResponse = (data: any, pagination?: any) => ({
+export const getResponse = (data: any, pagination?: IPagination) => ({
   success: true,
   message: `Data fetched successfully`,
   pagination,

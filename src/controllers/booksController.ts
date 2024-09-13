@@ -9,6 +9,7 @@ import {
   notFoundErrorResponse,
   updateResponse,
 } from '../utils/response';
+import { Authors, Books } from '../types/types';
 
 // Post books
 export const postBooksController = async (
@@ -20,11 +21,13 @@ export const postBooksController = async (
     const { title, description, published_date, author_id } = req.body;
 
     // Checking if a author exists with the same name
-    const existingBook = await db('books').where({ title }).first();
+    const existingBook = await db<Books>('books').where({ title }).first();
     if (existingBook) return res.status(400).json(existsErrorResponse('Book'));
 
     // Check if the author exists
-    const author = await db('authors').where({ id: author_id }).first();
+    const author = await db<Authors>('authors')
+      .where({ id: author_id })
+      .first();
     if (!author)
       return res
         .status(404)
@@ -39,7 +42,7 @@ export const postBooksController = async (
     };
 
     // Insert the book into the database
-    const result = await db('books').insert(book);
+    const result = await db<Books>('books').insert(book);
 
     const newBook = {
       id: result[0],
@@ -69,14 +72,14 @@ export const getBooksController = async (
     const searchQuery = (req.query.searchQuery as string) || '';
 
     // Query the database with pagination and search
-    const booksQuery = db('books')
+    const booksQuery = db<Books>('books')
       .select('*')
       .where('title', 'like', `%${searchQuery}%`)
       .orWhere('description', 'like', `%${searchQuery}%`)
       .offset(offset)
       .limit(limit);
 
-    const countQuery = db('books')
+    const countQuery = db<Books>('books')
       .count({ count: '*' })
       .where('title', 'like', `%${searchQuery}%`)
       .orWhere('description', 'like', `%${searchQuery}%`);
@@ -112,7 +115,7 @@ export const getSingleBookController = async (
       return res.status(400).json(errorResponse('Invalid book ID'));
 
     // Check if the book exists
-    const book = await db('books').where({ id }).first();
+    const book = await db<Books>('books').where({ id }).first();
     if (!book) return res.status(404).json(notFoundErrorResponse('Book'));
 
     res.status(200).json(getResponse(book));
@@ -136,7 +139,7 @@ export const updateBookController = async (
       return res.status(400).json(errorResponse('Invalid book ID'));
 
     // Check if the book exists
-    const book = await db('books').where({ id }).first();
+    const book = await db<Books>('books').where({ id }).first();
     if (!book) return res.status(404).json(notFoundErrorResponse('Book'));
 
     const updatedBook = {
@@ -177,7 +180,7 @@ export const deleteBookController = async (
       return res.status(400).json(errorResponse('Invalid book ID'));
 
     // Check if the book exists
-    const book = await db('books').where({ id }).first();
+    const book = await db<Books>('books').where({ id }).first();
     if (!book) return res.status(404).json(notFoundErrorResponse('book'));
 
     // Deleting Book
@@ -198,7 +201,7 @@ export const getBooksByAuthorId = async (
   try {
     const { id } = req.params;
 
-    const books = await db('books').where({ author_id: id });
+    const books = await db<Books>('books').where({ author_id: id });
 
     if (books.length === 0)
       return res

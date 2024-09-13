@@ -9,6 +9,7 @@ import {
   notFoundErrorResponse,
   updateResponse,
 } from '../utils/response';
+import { Authors } from '../types/types';
 
 // Post Authors
 export const postAuthorsController = async (
@@ -20,7 +21,7 @@ export const postAuthorsController = async (
     const { name, bio, birthDate } = req.body;
 
     // Checking if a author exists with the same name
-    const existingAuthor = await db('authors').where({ name }).first();
+    const existingAuthor = await db<Authors>('authors').where({ name }).first();
 
     if (existingAuthor)
       return res.status(400).json(existsErrorResponse('Author'));
@@ -33,7 +34,7 @@ export const postAuthorsController = async (
     };
 
     // Insert the book into the database
-    const result = await db('authors').insert(author);
+    const result = await db<Authors>('authors').insert(author);
 
     const payload = {
       id: result[0],
@@ -62,7 +63,7 @@ export const getAuthorsController = async (
     const searchQuery = (req.query.searchQuery as string) || '';
 
     // Query the database with pagination and search
-    const authorsQuery = db('authors')
+    const authorsQuery = db<Authors>('authors')
       .select('*')
       .where('name', 'like', `%${searchQuery}%`)
       .offset(offset)
@@ -106,7 +107,7 @@ export const getSingleAuthorController = async (
       return res.status(400).json(errorResponse('Invalid author ID'));
 
     // Check if the author exists
-    const author = await db('authors').where({ id }).first();
+    const author = await db<Authors>('authors').where({ id }).first();
     if (!author) return res.status(404).json(notFoundErrorResponse('Author'));
 
     res.status(200).json(getResponse(author));
@@ -130,7 +131,7 @@ export const updateAuthorController = async (
       return res.status(400).json(errorResponse('Invalid author ID'));
 
     // Check if the author exists
-    const author = await db('authors').where({ id }).first();
+    const author = await db<Authors>('authors').where({ id }).first();
     if (!author) return res.status(404).json(notFoundErrorResponse('Author'));
 
     const updatedAuthor = {
@@ -168,11 +169,11 @@ export const deleteAuthorController = async (
       return res.status(400).json(errorResponse('Invalid author ID'));
 
     // Check if the author exists
-    const author = await db('authors').where({ id }).first();
+    const author = await db<Authors>('authors').where({ id }).first();
     if (!author) return res.status(404).json(notFoundErrorResponse('Author'));
 
     // Deleting Author
-    await db('authors').where({ id }).del();
+    await db<Authors>('authors').where({ id }).del();
 
     res.status(200).json(deleteResponse('Author'));
   } catch (error: unknown) {
@@ -199,12 +200,10 @@ export const getAuthorsWithBooks = async (
 
     const query = `
     SELECT *, books.title as title, books.description as description FROM authors
-LEFT JOIN books ON authors.id = books.author_id
-GROUP BY authors.id`;
+    LEFT JOIN books ON authors.id = books.author_id
+    GROUP BY authors.id`;
 
     const authorsWithBooks = await db.raw(query);
-
-    console.log(authorsWithBooks);
 
     res.status(200).json(getResponse(authorsWithBooks[0]));
   } catch (error: unknown) {
