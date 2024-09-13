@@ -18,7 +18,7 @@ export const postAuthorsController = async (
   next: NextFunction,
 ) => {
   try {
-    const { name, bio, birthDate } = req.body;
+    const { name, bio, birthdate } = req.body;
 
     // Checking if a author exists with the same name
     const existingAuthor = await db<Authors>('authors').where({ name }).first();
@@ -30,7 +30,7 @@ export const postAuthorsController = async (
     const author = {
       name,
       bio,
-      birthDate: new Date(birthDate),
+      birthdate: new Date(birthdate),
     };
 
     // Insert the book into the database

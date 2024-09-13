@@ -8,7 +8,7 @@ export default function authorValidator(): ValidationChain[] {
       .isString()
       .withMessage('Name must be a string'),
     body('bio').optional().isString().withMessage('Bio must be a string'),
-    body('birthDate')
+    body('birthdate')
       .notEmpty()
       .withMessage('Birthdate is required')
       .isString()
