@@ -190,14 +190,22 @@ export const getBooksByAuthorId = async (
   try {
     const { id } = req.params;
 
-    const books = await db<Books>('books').where({ author_id: id });
+    // Check if id is valid
+    if (!id || isNaN(Number(id)))
+      return res.status(400).json(errorResponse('Invalid author ID'));
 
-    if (books.length === 0)
-      return res
-        .status(404)
-        .json(errorResponse('No books found for the specified author!'));
+    // Fetch author and books concurrently
+    const [author, books] = await Promise.all([
+      db<Authors>('authors').where({ id }).first(),
+      db<Books>('books').where({ author_id: id }),
+    ]);
 
-    res.status(200).json(getResponse(books));
+    // Check if author exists
+    if (!author) {
+      return res.status(404).json(notFoundErrorResponse('Author not found'));
+    }
+
+    res.status(200).json(getResponse({ ...author, books: books }));
   } catch (error) {
     next(error);
   }
