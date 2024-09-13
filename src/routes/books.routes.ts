@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import {
   deleteBookController,
-  getBooksByAuthorId,
   getBooksController,
   getSingleBookController,
   postBooksController,
@@ -22,7 +21,5 @@ booksRouter
   .get(getSingleBookController)
   .put(validate(bookValidator()), updateBookController)
   .delete(deleteBookController);
-
-booksRouter.get('/books/author/:id', getBooksByAuthorId);
 
 export default booksRouter;

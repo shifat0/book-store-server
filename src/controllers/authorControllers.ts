@@ -9,7 +9,7 @@ import {
   notFoundErrorResponse,
   updateResponse,
 } from '../utils/response';
-import { Authors } from '../types/types';
+import { Authors, Books } from '../types/types';
 
 // Post Authors
 export const postAuthorsController = async (
@@ -177,6 +177,28 @@ export const deleteAuthorController = async (
 
     res.status(200).json(deleteResponse('Author'));
   } catch (error: unknown) {
+    next(error);
+  }
+};
+
+// Retrieve a list of all books by a specific author
+export const getBooksByAuthorId = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { id } = req.params;
+
+    const books = await db<Books>('books').where({ author_id: id });
+
+    if (books.length === 0)
+      return res
+        .status(404)
+        .json(errorResponse('No books found for the specified author!'));
+
+    res.status(200).json(getResponse(books));
+  } catch (error) {
     next(error);
   }
 };

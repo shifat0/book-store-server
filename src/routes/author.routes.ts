@@ -3,13 +3,13 @@ import {
   deleteAuthorController,
   getAuthorsController,
   getAuthorsWithBooks,
+  getBooksByAuthorId,
   getSingleAuthorController,
   postAuthorsController,
   updateAuthorController,
 } from '../controllers/authorControllers';
 import validate from '../middlewares/validate';
 import authorValidator from '../validators/authorValidator';
-import { getBooksByAuthorId } from '../controllers/booksController';
 
 const authorsRouter = Router();
 
