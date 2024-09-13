@@ -84,10 +84,6 @@ export const getBooksController = async (
     const [books, countResult] = await Promise.all([booksQuery, countQuery]);
     const totalCount = countResult[0].count as number;
 
-    // Check if books exist
-    if (!books.length)
-      return res.status(404).json(notFoundErrorResponse('Books'));
-
     // Pagination response
     const pagination = {
       totalPages: Math.ceil(totalCount / limit),

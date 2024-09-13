@@ -78,10 +78,6 @@ export const getAuthorsController = async (
     ]);
     const totalCount = countResult[0].count as number;
 
-    // Check if authors exist
-    if (!authors.length)
-      return res.status(404).json(notFoundErrorResponse('Authors'));
-
     // Prepare pagination response
     const pagination = {
       totalPages: Math.ceil(totalCount / limit),

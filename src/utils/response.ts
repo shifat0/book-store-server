@@ -7,7 +7,7 @@ export const createResponse = (data?: any, title?: string) => ({
 export const getResponse = (data: any, pagination?: any) => ({
   success: true,
   message: `Data fetched successfully`,
-  ...pagination,
+  pagination,
   data: data,
 });
 
