@@ -9,7 +9,7 @@ import {
   notFoundErrorResponse,
   updateResponse,
 } from '../utils/response';
-import { Authors, Books } from '../types/types';
+import { Authors, Books, IAuthorRow, IAuthorWithBooks } from '../types/types';
 
 // Post Authors
 export const postAuthorsController = async (
@@ -181,7 +181,7 @@ export const deleteAuthorController = async (
   }
 };
 
-// Retrieve a list of all books by a specific author
+// Get all books by an author
 export const getBooksByAuthorId = async (
   req: Request,
   res: Response,
@@ -211,31 +211,65 @@ export const getBooksByAuthorId = async (
   }
 };
 
+// Get All Authors with their books
 export const getAuthorsWithBooks = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    // const authorsWithBooks = await db('authors')
-    //   .select(
-    //     'authors.id as author_id',
-    //     'name as author_name',
-    //     'bio as author_bio',
-    //     'birthdate as author_birthdate',
-    //   )
-    //   .leftJoin('books', 'authors.id', '=', 'books.author_id')
-    //   .orderBy(['authors.id', 'books.id'])
-    //   .groupBy('authors.id');
+    const authorsWithBooksQuery = await db<Authors>('authors')
+      .select(
+        'authors.id as author_id',
+        'authors.name as author_name',
+        'authors.bio as author_bio',
+        'authors.birthdate as author_birthdate',
+        'books.id as book_id',
+        'books.title as book_title',
+        'books.description as book_description',
+        'books.published_date as book_published_date',
+      )
+      .leftJoin('books', 'authors.id', '=', 'books.author_id')
+      .orderBy('authors.id', 'asc');
 
-    const query = `
-    SELECT *, books.title as title, books.description as description FROM authors
-    LEFT JOIN books ON authors.id = books.author_id
-    GROUP BY authors.id`;
+    const authorsWithBooks = authorsWithBooksQuery.reduce(
+      (acc: IAuthorWithBooks[], row: IAuthorRow) => {
+        const author = acc.find((a) => a.id === row.author_id);
+        if (author) {
+          // If the author already exists in the accumulator, add the book (if it exists)
+          if (row.book_id) {
+            author.books.push({
+              id: row.book_id,
+              title: row.book_title,
+              description: row.book_description,
+              published_date: row.book_published_date,
+            });
+          }
+        } else {
+          // Add a new author with their book (if any)
+          acc.push({
+            id: row.author_id,
+            name: row.author_name,
+            bio: row.author_bio,
+            birthdate: row.author_birthdate,
+            books: row.book_id
+              ? [
+                  {
+                    id: row.book_id,
+                    title: row.book_title,
+                    description: row.book_description,
+                    published_date: row.book_published_date,
+                  },
+                ]
+              : [], // No books for this author
+          });
+        }
+        return acc;
+      },
+      [],
+    );
 
-    const authorsWithBooks = await db.raw(query);
-
-    res.status(200).json(getResponse(authorsWithBooks[0]));
+    res.status(200).json(getResponse(authorsWithBooks));
   } catch (error: unknown) {
     next(error);
   }
