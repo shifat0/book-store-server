@@ -25,9 +25,15 @@ npm install
 
 ## Database Setup
 
-1. Create a MySQL database:
+1. Create a MySQL database (schema) using MySQL Workbench:
 
-```bash
+```sql
+CREATE SCHEMA book_store;
+```
+
+Alternatively, you can use:
+
+```sql
 CREATE DATABASE book_store;
 ```
 
@@ -35,15 +41,29 @@ CREATE DATABASE book_store;
 
 .env.example file is given in this repository. Follow the .env.example
 
-3. Run Migrations:
+3. Run Migrations Already created in the './src/models/migrations' folder:
 
 ```bash
 npm run migrate
 ```
 
-Migration files are located at './src/models/migrations' folder
+Alternatively if you want to create a new migration:
+
+```bash
+    npx knex migrate:make <migration-name>
+```
+
+After this command migration file will be created in './src/models/migrations' folder. Then run the following command:
+
+```bash
+    npm run migrate
+```
+
+Your Database is setup now.
 
 ## Run the server
+
+The Final step to run the development server.
 
 ```bash
 npm run dev
