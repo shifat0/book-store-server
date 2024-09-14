@@ -75,26 +75,40 @@ export const getBooksController = async (
     // Query the database with pagination and search
     const booksQuery = db<Books>('books')
       .select('*')
-      .where('author_id', authorId)
-      .andWhere(function () {
-        this.where('title', 'like', `%${searchQuery}%`).orWhere(
-          'description',
-          'like',
-          `%{searchQuery}%`,
-        );
+      .modify((queryBuilder) => {
+        // Add the `where` clause for author_id only if it is provided
+        if (authorId) {
+          queryBuilder.where('author_id', authorId);
+        }
+
+        // Add the search query conditions
+        queryBuilder.where(function () {
+          this.where('title', 'like', `%${searchQuery}%`).orWhere(
+            'description',
+            'like',
+            `%${searchQuery}%`,
+          );
+        });
       })
       .offset(offset)
       .limit(limit);
 
     const countQuery = db<Books>('books')
       .count({ count: '*' })
-      .where('author_id', authorId)
-      .andWhere(function () {
-        this.where('title', 'like', `%${searchQuery}%`).orWhere(
-          'description',
-          'like',
-          `%{searchQuery}%`,
-        );
+      .modify((queryBuilder) => {
+        // Add the `where` clause for author_id only if it is provided
+        if (authorId) {
+          queryBuilder.where('author_id', authorId);
+        }
+
+        // Add the search query conditions
+        queryBuilder.where(function () {
+          this.where('title', 'like', `%${searchQuery}%`).orWhere(
+            'description',
+            'like',
+            `%${searchQuery}%`,
+          );
+        });
       });
 
     const [books, countResult] = await Promise.all([booksQuery, countQuery]);
