@@ -50,7 +50,7 @@ export const postBooksController = async (
     };
 
     // Return the created book with a 201 status code
-    res.status(201).json(createResponse(newBook, 'Book'));
+    res.status(201).json(createResponse<Books>(newBook, 'Book'));
   } catch (error) {
     next(error);
   }
@@ -108,7 +108,7 @@ export const getBooksController = async (
       totalItems: totalCount,
     };
 
-    res.status(200).json(getResponse(books, pagination));
+    res.status(200).json(getResponse<Books[]>(books, pagination));
   } catch (error) {
     next(error);
   }
@@ -166,7 +166,7 @@ export const getSingleBookController = async (
       },
     };
 
-    res.status(200).json(getResponse(bookResponse));
+    res.status(200).json(getResponse<Books>(bookResponse));
   } catch (error) {
     next(error);
   }
@@ -187,7 +187,9 @@ export const updateBookController = async (
       return res.status(400).json(errorResponse('Invalid book ID'));
 
     // Check if the book exists
-    const book = await db<Books>('books').where({ id }).first();
+    const book = await db<Books>('books')
+      .where({ id: Number(id) })
+      .first();
     if (!book) return res.status(404).json(notFoundErrorResponse('Book'));
 
     const updatedBook = {
@@ -208,7 +210,9 @@ export const updateBookController = async (
         .json(errorResponse('Book update failed due to server error!'));
 
     // Return the updated author
-    res.status(200).json(updateResponse('Book', updatedBook));
+    res
+      .status(200)
+      .json(updateResponse<Omit<Books, 'id'>>('Book', updatedBook));
   } catch (error) {
     next(error);
   }
@@ -228,7 +232,9 @@ export const deleteBookController = async (
       return res.status(400).json(errorResponse('Invalid book ID'));
 
     // Check if the book exists
-    const book = await db<Books>('books').where({ id }).first();
+    const book = await db<Books>('books')
+      .where({ id: Number(id) })
+      .first();
     if (!book) return res.status(404).json(notFoundErrorResponse('book'));
 
     // Deleting Book

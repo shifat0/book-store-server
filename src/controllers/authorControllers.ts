@@ -41,7 +41,7 @@ export const postAuthorsController = async (
       ...author,
     };
 
-    res.status(201).json(createResponse(payload, 'Author'));
+    res.status(201).json(createResponse<Authors>(payload, 'Author'));
   } catch (error: unknown) {
     next(error);
   }
@@ -87,7 +87,7 @@ export const getAuthorsController = async (
       totalItems: totalCount,
     };
 
-    res.status(200).json(getResponse(authors, pagination));
+    res.status(200).json(getResponse<Authors[]>(authors, pagination));
   } catch (error: unknown) {
     next(error);
   }
@@ -107,10 +107,12 @@ export const getSingleAuthorController = async (
       return res.status(400).json(errorResponse('Invalid author ID'));
 
     // Check if the author exists
-    const author = await db<Authors>('authors').where({ id }).first();
+    const author = await db<Authors>('authors')
+      .where({ id: Number(id) })
+      .first();
     if (!author) return res.status(404).json(notFoundErrorResponse('Author'));
 
-    res.status(200).json(getResponse(author));
+    res.status(200).json(getResponse<Authors>(author));
   } catch (error: unknown) {
     next(error);
   }
@@ -131,7 +133,9 @@ export const updateAuthorController = async (
       return res.status(400).json(errorResponse('Invalid author ID'));
 
     // Check if the author exists
-    const author = await db<Authors>('authors').where({ id }).first();
+    const author = await db<Authors>('authors')
+      .where({ id: Number(id) })
+      .first();
     if (!author) return res.status(404).json(notFoundErrorResponse('Author'));
 
     const updatedAuthor = {
@@ -141,7 +145,9 @@ export const updateAuthorController = async (
     };
 
     // Update the author
-    const isUpdated = await db('authors').where({ id }).update(updatedAuthor);
+    const isUpdated = await db<Authors>('authors')
+      .where({ id: Number(id) })
+      .update(updatedAuthor);
 
     if (isUpdated !== 1)
       return res
@@ -149,7 +155,9 @@ export const updateAuthorController = async (
         .json(errorResponse('Author update failed due to server error!'));
 
     // Return the updated author
-    res.status(200).json(updateResponse('Author', updatedAuthor));
+    res
+      .status(200)
+      .json(updateResponse<Omit<Authors, 'id'>>('Author', updatedAuthor));
   } catch (error: unknown) {
     next(error);
   }
@@ -169,11 +177,15 @@ export const deleteAuthorController = async (
       return res.status(400).json(errorResponse('Invalid author ID'));
 
     // Check if the author exists
-    const author = await db<Authors>('authors').where({ id }).first();
+    const author = await db<Authors>('authors')
+      .where({ id: Number(id) })
+      .first();
     if (!author) return res.status(404).json(notFoundErrorResponse('Author'));
 
     // Deleting Author
-    await db<Authors>('authors').where({ id }).del();
+    await db<Authors>('authors')
+      .where({ id: Number(id) })
+      .del();
 
     res.status(200).json(deleteResponse('Author'));
   } catch (error: unknown) {
@@ -196,7 +208,9 @@ export const getBooksByAuthorId = async (
 
     // Fetch author and books concurrently
     const [author, books] = await Promise.all([
-      db<Authors>('authors').where({ id }).first(),
+      db<Authors>('authors')
+        .where({ id: Number(id) })
+        .first(),
       db<Books>('books').where({ author_id: id }),
     ]);
 
@@ -205,7 +219,9 @@ export const getBooksByAuthorId = async (
       return res.status(404).json(notFoundErrorResponse('Author not found'));
     }
 
-    res.status(200).json(getResponse({ ...author, books: books }));
+    res
+      .status(200)
+      .json(getResponse<IAuthorWithBooks>({ ...author, books: books }));
   } catch (error) {
     next(error);
   }
@@ -239,7 +255,7 @@ export const getAuthorsWithBooks = async (
           // If the author already exists in the accumulator, add the book (if it exists)
           if (row.book_id) {
             author.books.push({
-              id: row.book_id,
+              id: Number(row.book_id),
               title: row.book_title,
               description: row.book_description,
               published_date: row.book_published_date,
@@ -252,7 +268,7 @@ export const getAuthorsWithBooks = async (
             name: row.author_name,
             bio: row.author_bio,
             birthdate: row.author_birthdate,
-            books: row.book_id
+            books: Number(row.book_id)
               ? [
                   {
                     id: row.book_id,

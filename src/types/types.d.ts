@@ -1,12 +1,12 @@
 export interface Authors {
-  id: string;
+  id: number;
   name: string;
   bio?: string;
   birthdate: Date;
 }
 
 export interface Books {
-  id: string;
+  id: number;
   title: string;
   description?: string;
   published_date: Date;
@@ -34,17 +34,17 @@ export interface IPagination {
 }
 
 export interface IAuthorRow {
-  author_id: string;
+  author_id: number;
   author_name: string;
   author_bio?: string;
   author_birthdate: Date;
-  book_id?: string;
+  book_id?: number;
   book_title?: string;
   book_description?: string;
   book_published_date?: Date;
 }
 export interface IAuthorWithBooks {
-  id: string;
+  id: number;
   name: string;
   bio?: string;
   birthdate: Date;
